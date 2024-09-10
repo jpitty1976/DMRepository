@@ -1,0 +1,2743 @@
+
+DROP TABLE [TBL_ORDER_DETAILS]
+go
+
+DROP TABLE [TBL_PRDCTS]
+go
+
+DROP TABLE [TBL_SPPRS]
+go
+
+DROP TABLE [TBL_CTGRIES]
+go
+
+DROP TABLE [TBL_ORDRS]
+go
+
+DROP TABLE [TBL_SHPPRS]
+go
+
+DROP TABLE [TBL_EMPTRTRS]
+go
+
+DROP TABLE [TBL_TRTRS]
+go
+
+DROP TABLE [TBL_RGN]
+go
+
+DROP TABLE [TBL_EMPS]
+go
+
+DROP TABLE [TBL_CSTMRCSTMRDEMO]
+go
+
+DROP TABLE [TBL_CSTMRS]
+go
+
+DROP TABLE [TBL_CSTMRDEMOGRPHS]
+go
+
+DROP DATABASE [master]
+go
+
+CREATE DATABASE [master]
+CONTAINMENT = NONE
+ON PRIMARY
+( 
+	NAME = 'master', 
+	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\master.mdf', 
+	SIZE = 4544, 
+	MAXSIZE = UNLIMITED, 
+	FILEGROWTH = 10%
+) 
+LOG ON 
+( 
+	NAME = 'mastlog', 
+	FILENAME = 'C:\Program Files\Microsoft SQL Server\MSSQL15.MSSQLSERVER\MSSQL\DATA\mastlog.ldf', 
+	SIZE = 2048, 
+	MAXSIZE = UNLIMITED, 
+	FILEGROWTH = 10%
+) 
+COLLATE SQL_Latin1_General_CP1_CI_AS
+WITH 
+	TRUSTWORTHY OFF,
+	DB_CHAINING ON,
+	FILESTREAM( NON_TRANSACTED_ACCESS = OFF )
+go
+
+EXEC sp_db_vardecimal_storage_format [master],'OFF'
+go
+
+USE [master]
+go
+
+EXECUTE sys.sp_cdc_disable_db 
+go
+
+ALTER DATABASE [master]
+SET
+ONLINE,
+MULTI_USER ,
+READ_WRITE,
+PARAMETERIZATION SIMPLE,
+DATE_CORRELATION_OPTIMIZATION OFF,
+DELAYED_DURABILITY = DISABLED,
+MEMORY_OPTIMIZED_ELEVATE_TO_SNAPSHOT = OFF
+go
+
+ALTER DATABASE [master]
+SET CURSOR_CLOSE_ON_COMMIT OFF,
+CURSOR_DEFAULT GLOBAL,
+AUTO_CLOSE OFF,
+AUTO_CREATE_STATISTICS ON,
+AUTO_SHRINK OFF,
+AUTO_UPDATE_STATISTICS ON,
+AUTO_UPDATE_STATISTICS_ASYNC OFF,
+ANSI_NULL_DEFAULT OFF,
+ANSI_NULLS OFF,
+ANSI_PADDING OFF,
+ANSI_WARNINGS OFF,
+ARITHABORT OFF,
+CONCAT_NULL_YIELDS_NULL OFF,
+NUMERIC_ROUNDABORT OFF,
+QUOTED_IDENTIFIER OFF,
+RECURSIVE_TRIGGERS OFF,
+RECOVERY SIMPLE,
+TORN_PAGE_DETECTION OFF,
+PAGE_VERIFY CHECKSUM
+go
+
+ALTER DATABASE [master]
+SET ALLOW_SNAPSHOT_ISOLATION ON
+go
+
+ALTER DATABASE [master]
+SET READ_COMMITTED_SNAPSHOT OFF
+go
+
+CREATE ASSEMBLY [Microsoft.SqlServer.Types]
+AUTHORIZATION [sys]
+FROM
+'microsoft.sqlserver.types.dll'
+WITH PERMISSION_SET = UNSAFE
+go
+
+ALTER ASSEMBLY [Microsoft.SqlServer.Types]
+WITH
+VISIBILITY = ON
+go
+
+USE master;
+go
+
+CREATE CERTIFICATE [##MS_SchemaSigningCertificateF5DC096FAF20C89D15C0E7B798CD384DACD92ADB##]
+AUTHORIZATION dbo
+	/* ENCRYPTION BY PASSWORD = */
+	WITH SUBJECT = 'MS_SchemaSigningCertificateF5DC096FAF20C89D15C0E7B798CD384DACD92ADB',
+	START_DATE = '09/24/2019',
+	EXPIRY_DATE = '09/24/2020'
+	ACTIVE FOR BEGIN_DIALOG = ON
+go
+
+CREATE USER [##MS_PolicyEventProcessingLogin##]
+FOR LOGIN [##MS_PolicyEventProcessingLogin##]
+WITH DEFAULT_SCHEMA = dbo
+go
+
+CREATE USER [##MS_AgentSigningCertificate##]
+FOR CERTIFICATE [##MS_AgentSigningCertificate##]
+go
+
+ALTER DATABASE [master]
+SET ENCRYPTION OFF
+go
+
+ALTER DATABASE [master]
+SET CHANGE_TRACKING = OFF
+go
+
+ALTER DATABASE [master]
+ MODIFY FILEGROUP [PRIMARY] ReadWrite 
+go
+
+CREATE TABLE [TBL_CSTMRCSTMRDEMO]
+( 
+	[CustomerID]         nchar(5) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[CustomerTypeID]     nchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL 
+)
+go
+
+CREATE TABLE [TBL_CSTMRDEMOGRPHS]
+( 
+	[CustomerTypeID]     nchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[CustomerDesc]       ntext COLLATE SQL_Latin1_General_CP1_CI_AS  NULL 
+)
+go
+
+CREATE TABLE [TBL_CSTMRS]
+( 
+	[CustomerID]         nchar(5) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[CompanyName]        nvarchar(40) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[ContactName]        nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ContactTitle]       nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Address]            nvarchar(60) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[City]               nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Region]             nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[PostalCode]         nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Country]            nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Phone]              nvarchar(24) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Fax]                nvarchar(24) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL 
+)
+go
+
+CREATE TABLE [TBL_CTGRIES]
+( 
+	[CategoryID]         int  IDENTITY ( 1,1 )  NOT NULL ,
+	[CategoryName]       nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[Description]        ntext COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Picture]            image  NULL 
+)
+go
+
+CREATE TABLE [TBL_EMPS]
+( 
+	[EmployeeID]         int  IDENTITY ( 1,1 )  NOT NULL ,
+	[LastName]           nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[FirstName]          nvarchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[Title]              nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[TitleOfCourtesy]    nvarchar(25) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[BirthDate]          datetime  NULL ,
+	[HireDate]           datetime  NULL ,
+	[Address]            nvarchar(60) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[City]               nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Region]             nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[PostalCode]         nvarchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Country]            nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[HomePhone]          nvarchar(24) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Extension]          nvarchar(4) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Photo]              image  NULL ,
+	[Notes]              ntext COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ReportsTo]          int  NULL ,
+	[PhotoPath]          nvarchar(255) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL 
+)
+go
+
+ALTER TABLE [TBL_EMPS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_Birthdate] CHECK  ( [BirthDate]<getdate() )
+go
+
+CREATE TABLE [TBL_EMPTRTRS]
+( 
+	[EmployeeID]         int  NOT NULL ,
+	[TerritoryID]        nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL 
+)
+go
+
+CREATE TABLE [TBL_ORDER_DETAILS]
+( 
+	[OrderID]            int  NOT NULL ,
+	[ProductID]          int  NOT NULL ,
+	[UnitPrice]          money  NOT NULL 
+	CONSTRAINT [DF_Order_Details_UnitPrice]
+		 DEFAULT  0,
+	[Quantity]           smallint  NOT NULL 
+	CONSTRAINT [DF_Order_Details_Quantity]
+		 DEFAULT  1,
+	[Discount]           real  NOT NULL 
+	CONSTRAINT [DF_Order_Details_Discount]
+		 DEFAULT  0
+)
+go
+
+ALTER TABLE [TBL_ORDER_DETAILS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_UnitPrice] CHECK  ( UnitPrice >= 0 )
+go
+
+ALTER TABLE [TBL_ORDER_DETAILS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_Quantity] CHECK  ( [Quantity]>(0) )
+go
+
+ALTER TABLE [TBL_ORDER_DETAILS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_Discount] CHECK  ( Discount BETWEEN 0 AND 1 )
+go
+
+CREATE TABLE [TBL_ORDRS]
+( 
+	[OrderID]            int  IDENTITY ( 1,1 )  NOT NULL ,
+	[CustomerID]         nchar(5) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[EmployeeID]         int  NULL ,
+	[OrderDate]          datetime  NULL ,
+	[RequiredDate]       datetime  NULL ,
+	[ShippedDate]        datetime  NULL ,
+	[ShipVia]            int  NULL ,
+	[Freight]            money  NULL 
+	CONSTRAINT [DF_Orders_Freight]
+		 DEFAULT  0,
+	[ShipName]           nvarchar(40) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ShipAddress]        nvarchar(60) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ShipCity]           nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ShipRegion]         nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ShipPostalCode]     nvarchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ShipCountry]        nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL 
+)
+go
+
+CREATE TABLE [TBL_PRDCTS]
+( 
+	[ProductID]          int  IDENTITY ( 1,1 )  NOT NULL ,
+	[ProductName]        nvarchar(40) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[SupplierID]         int  NULL ,
+	[QuantityPerUnit]    nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[UnitPrice]          money  NULL 
+	CONSTRAINT [DF_Products_UnitPrice]
+		 DEFAULT  0,
+	[UnitsInStock]       smallint  NULL 
+	CONSTRAINT [DF_Products_UnitsInStock]
+		 DEFAULT  0,
+	[UnitsOnOrder]       smallint  NULL 
+	CONSTRAINT [DF_Products_UnitsOnOrder]
+		 DEFAULT  0,
+	[ReorderLevel]       smallint  NULL 
+	CONSTRAINT [DF_Products_ReorderLevel]
+		 DEFAULT  0,
+	[Discontinued]       bit  NOT NULL 
+	CONSTRAINT [DF_Products_Discontinued]
+		 DEFAULT  0,
+	[CategoryID]         int  NULL 
+)
+go
+
+ALTER TABLE [TBL_PRDCTS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_Products_UnitPrice] CHECK  ( UnitPrice >= 0 )
+go
+
+ALTER TABLE [TBL_PRDCTS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_UnitsInStock] CHECK  ( UnitsInStock >= 0 )
+go
+
+ALTER TABLE [TBL_PRDCTS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_UnitsOnOrder] CHECK  ( UnitsOnOrder >= 0 )
+go
+
+ALTER TABLE [TBL_PRDCTS]
+	 WITH NOCHECK ADD CONSTRAINT [CK_ReorderLevel] CHECK  ( ReorderLevel >= 0 )
+go
+
+CREATE TABLE [TBL_RGN]
+( 
+	[RegionID]           int  NOT NULL ,
+	[RegionDescription]  nchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL 
+)
+go
+
+CREATE TABLE [TBL_SHPPRS]
+( 
+	[ShipperID]          int  IDENTITY ( 1,1 )  NOT NULL ,
+	[CompanyName]        nvarchar(40) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[Phone]              nvarchar(24) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL 
+)
+go
+
+CREATE TABLE [TBL_SPPRS]
+( 
+	[SupplierID]         int  IDENTITY ( 1,1 )  NOT NULL ,
+	[CompanyName]        nvarchar(40) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[ContactName]        nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[ContactTitle]       nvarchar(30) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Address]            nvarchar(60) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[City]               nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Region]             nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[PostalCode]         nvarchar(10) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Country]            nvarchar(15) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Phone]              nvarchar(24) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[Fax]                nvarchar(24) COLLATE SQL_Latin1_General_CP1_CI_AS  NULL ,
+	[HomePage]           ntext COLLATE SQL_Latin1_General_CP1_CI_AS  NULL 
+)
+go
+
+CREATE TABLE [TBL_TRTRS]
+( 
+	[TerritoryID]        nvarchar(20) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[TerritoryDescription] nchar(50) COLLATE SQL_Latin1_General_CP1_CI_AS  NOT NULL ,
+	[RegionID]           int  NOT NULL 
+)
+go
+
+CREATE UNIQUE NONCLUSTERED INDEX [PK_CustomerCustomerDemo] ON [TBL_CSTMRCSTMRDEMO]
+( 
+	[CustomerID]          ASC,
+	[CustomerTypeID]      ASC
+)
+go
+
+CREATE UNIQUE NONCLUSTERED INDEX [PK_CustomerDemographics] ON [TBL_CSTMRDEMOGRPHS]
+( 
+	[CustomerTypeID]      ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Customers] ON [TBL_CSTMRS]
+( 
+	[CustomerID]          ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [City] ON [TBL_CSTMRS]
+( 
+	[City]                ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [CompanyName] ON [TBL_CSTMRS]
+( 
+	[CompanyName]         ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [PostalCode] ON [TBL_CSTMRS]
+( 
+	[PostalCode]          ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [Region] ON [TBL_CSTMRS]
+( 
+	[Region]              ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Categories] ON [TBL_CTGRIES]
+( 
+	[CategoryID]          ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [CategoryName] ON [TBL_CTGRIES]
+( 
+	[CategoryName]        ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Employees] ON [TBL_EMPS]
+( 
+	[EmployeeID]          ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [LastName] ON [TBL_EMPS]
+( 
+	[LastName]            ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [PostalCode] ON [TBL_EMPS]
+( 
+	[PostalCode]          ASC
+)
+go
+
+CREATE UNIQUE NONCLUSTERED INDEX [PK_EmployeeTerritories] ON [TBL_EMPTRTRS]
+( 
+	[EmployeeID]          ASC,
+	[TerritoryID]         ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Order_Details] ON [TBL_ORDER_DETAILS]
+( 
+	[OrderID]             ASC,
+	[ProductID]           ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [OrdersOrder_Details] ON [TBL_ORDER_DETAILS]
+( 
+	[OrderID]             ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [ProductsOrder_Details] ON [TBL_ORDER_DETAILS]
+( 
+	[ProductID]           ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Orders] ON [TBL_ORDRS]
+( 
+	[OrderID]             ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [OrderDate] ON [TBL_ORDRS]
+( 
+	[OrderDate]           ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [ShippedDate] ON [TBL_ORDRS]
+( 
+	[ShippedDate]         ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [ShipPostalCode] ON [TBL_ORDRS]
+( 
+	[ShipPostalCode]      ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [CustomersOrders] ON [TBL_ORDRS]
+( 
+	[CustomerID]          ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [EmployeesOrders] ON [TBL_ORDRS]
+( 
+	[EmployeeID]          ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Products] ON [TBL_PRDCTS]
+( 
+	[ProductID]           ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [ProductName] ON [TBL_PRDCTS]
+( 
+	[ProductName]         ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [CategoryID] ON [TBL_PRDCTS]
+( 
+	[CategoryID]          ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [SuppliersProducts] ON [TBL_PRDCTS]
+( 
+	[SupplierID]          ASC
+)
+go
+
+CREATE UNIQUE NONCLUSTERED INDEX [PK_Region] ON [TBL_RGN]
+( 
+	[RegionID]            ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Shippers] ON [TBL_SHPPRS]
+( 
+	[ShipperID]           ASC
+)
+go
+
+CREATE UNIQUE CLUSTERED INDEX [PK_Suppliers] ON [TBL_SPPRS]
+( 
+	[SupplierID]          ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [CompanyName] ON [TBL_SPPRS]
+( 
+	[CompanyName]         ASC
+)
+go
+
+CREATE NONCLUSTERED INDEX [PostalCode] ON [TBL_SPPRS]
+( 
+	[PostalCode]          ASC
+)
+go
+
+CREATE UNIQUE NONCLUSTERED INDEX [PK_Territories] ON [TBL_TRTRS]
+( 
+	[TerritoryID]         ASC
+)
+go
+
+CREATE VIEW [Customer and Suppliers by City] AS  SELECT City, CompanyName, ContactName, 'Customers' AS Relationship FROM Customers UNION SELECT City, CompanyName, ContactName, 'Suppliers' FROM Suppliers
+go
+
+CREATE VIEW [Alphabetical list of products] AS  SELECT Products.*, Categories.CategoryName FROM Categories   INNER JOIN   Products ON Categories.CategoryID = Products.CategoryID WHERE ( ( (Products.Discontinued) = 0 ) )
+go
+
+CREATE VIEW [CURRENT_PRODUCT_LIST]([ProductID],[ProductName])
+AS
+SELECT Product_List.[ProductID],Product_List.[ProductName]
+	FROM [TBL_PRDCTS] Product_List
+		WHERE ( ( (Product_List.Discontinued) = 0 ) )
+go
+
+CREATE VIEW [Orders Qry] AS  SELECT Orders.OrderID, Orders.CustomerID, Orders.EmployeeID, Orders.OrderDate, Orders.RequiredDate, Orders.ShippedDate, Orders.ShipVia, Orders.Freight, Orders.ShipName, Orders.ShipAddress, Orders.ShipCity, Orders.ShipRegion, Orders.ShipPostalCode, Orders.ShipCountry, Customers.CompanyName, Customers.Address, Customers.City, Customers.Region, Customers.PostalCode, Customers.Country FROM Customers   INNER JOIN   Orders ON Customers.CustomerID = Orders.CustomerID
+go
+
+CREATE VIEW [PRODUCTS_ABOVE_AVERAGE_PRICE]([ProductName],[UnitPrice])
+AS
+SELECT [Products].[ProductName],[Products].[UnitPrice]
+	FROM [TBL_PRDCTS]
+		WHERE Products.UnitPrice > (  SELECT AVG( UnitPrice) FROM Products )
+go
+
+CREATE VIEW [Products by Category] AS  SELECT Categories.CategoryName, Products.ProductName, Products.QuantityPerUnit, Products.UnitsInStock, Products.Discontinued FROM Categories   INNER JOIN   Products ON Categories.CategoryID = Products.CategoryID WHERE Products.Discontinued <> 1
+go
+
+CREATE VIEW [Quarterly Orders] AS  SELECT  DISTINCT Customers.CustomerID, Customers.CompanyName, Customers.City, Customers.Country FROM Customers   RIGHT JOIN   Orders ON Customers.CustomerID = Orders.CustomerID WHERE Orders.OrderDate BETWEEN '19970101' AND '19971231'
+go
+
+
+ALTER TABLE [TBL_CSTMRCSTMRDEMO] WITH CHECK 
+	ADD CONSTRAINT [FK_CustomerCustomerDemo] FOREIGN KEY ([CustomerTypeID]) REFERENCES [TBL_CSTMRDEMOGRPHS]([CustomerTypeID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_CSTMRCSTMRDEMO]
+	  WITH CHECK CHECK CONSTRAINT [FK_CustomerCustomerDemo]
+go
+
+ALTER TABLE [TBL_CSTMRCSTMRDEMO] WITH CHECK 
+	ADD CONSTRAINT [FK_CustomerCustomerDemo_Customers] FOREIGN KEY ([CustomerID]) REFERENCES [TBL_CSTMRS]([CustomerID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_CSTMRCSTMRDEMO]
+	  WITH CHECK CHECK CONSTRAINT [FK_CustomerCustomerDemo_Customers]
+go
+
+
+ALTER TABLE [TBL_EMPS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Employees_Employees] FOREIGN KEY ([ReportsTo]) REFERENCES [TBL_EMPS]([EmployeeID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_EMPS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Employees_Employees]
+go
+
+
+ALTER TABLE [TBL_EMPTRTRS] WITH CHECK 
+	ADD CONSTRAINT [FK_EmployeeTerritories_Employees] FOREIGN KEY ([EmployeeID]) REFERENCES [TBL_EMPS]([EmployeeID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_EMPTRTRS]
+	  WITH CHECK CHECK CONSTRAINT [FK_EmployeeTerritories_Employees]
+go
+
+ALTER TABLE [TBL_EMPTRTRS] WITH CHECK 
+	ADD CONSTRAINT [FK_EmployeeTerritories_Territories] FOREIGN KEY ([TerritoryID]) REFERENCES [TBL_TRTRS]([TerritoryID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_EMPTRTRS]
+	  WITH CHECK CHECK CONSTRAINT [FK_EmployeeTerritories_Territories]
+go
+
+
+ALTER TABLE [TBL_ORDER_DETAILS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Order_Details_Orders] FOREIGN KEY ([OrderID]) REFERENCES [TBL_ORDRS]([OrderID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_ORDER_DETAILS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Order_Details_Orders]
+go
+
+ALTER TABLE [TBL_ORDER_DETAILS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Order_Details_Products] FOREIGN KEY ([ProductID]) REFERENCES [TBL_PRDCTS]([ProductID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_ORDER_DETAILS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Order_Details_Products]
+go
+
+
+ALTER TABLE [TBL_ORDRS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Orders_Customers] FOREIGN KEY ([CustomerID]) REFERENCES [TBL_CSTMRS]([CustomerID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_ORDRS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Orders_Customers]
+go
+
+ALTER TABLE [TBL_ORDRS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Orders_Employees] FOREIGN KEY ([EmployeeID]) REFERENCES [TBL_EMPS]([EmployeeID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_ORDRS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Orders_Employees]
+go
+
+ALTER TABLE [TBL_ORDRS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Orders_Shippers] FOREIGN KEY ([ShipVia]) REFERENCES [TBL_SHPPRS]([ShipperID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_ORDRS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Orders_Shippers]
+go
+
+
+ALTER TABLE [TBL_PRDCTS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Products_Categories] FOREIGN KEY ([CategoryID]) REFERENCES [TBL_CTGRIES]([CategoryID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_PRDCTS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Products_Categories]
+go
+
+ALTER TABLE [TBL_PRDCTS] WITH NOCHECK 
+	ADD CONSTRAINT [FK_Products_Suppliers] FOREIGN KEY ([SupplierID]) REFERENCES [TBL_SPPRS]([SupplierID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_PRDCTS]
+	  WITH NOCHECK CHECK CONSTRAINT [FK_Products_Suppliers]
+go
+
+
+ALTER TABLE [TBL_TRTRS] WITH CHECK 
+	ADD CONSTRAINT [FK_Territories_Region] FOREIGN KEY ([RegionID]) REFERENCES [TBL_RGN]([RegionID])
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
+go
+
+ALTER TABLE [TBL_TRTRS]
+	  WITH CHECK CHECK CONSTRAINT [FK_Territories_Region]
+go
+
+CREATE PROCEDURE [Ten_Most_Expensive_Products]   
+   
+ AS SET ROWCOUNT 10
+SELECT Products.ProductName AS TenMostExpensiveProducts, Products.UnitPrice
+FROM Products
+ORDER BY Products.UnitPrice DESC
+go
+
+CREATE PROCEDURE [Employee_Sales_by_Country] @Beginning_Date datetime , @Ending_Date datetime   
+   
+ AS SELECT Employees.Country, Employees.LastName, Employees.FirstName, Orders.ShippedDate, Orders.OrderID, "Order Subtotals".Subtotal AS SaleAmount
+FROM Employees INNER JOIN 
+	(Orders INNER JOIN "Order Subtotals" ON Orders.OrderID = "Order Subtotals".OrderID) 
+	ON Employees.EmployeeID = Orders.EmployeeID
+WHERE Orders.ShippedDate Between @Beginning_Date And @Ending_Date
+go
+
+CREATE PROCEDURE [Sales_by_Year] @Beginning_Date datetime , @Ending_Date datetime   
+   
+ AS SELECT Orders.ShippedDate, Orders.OrderID, "Order Subtotals".Subtotal, DATENAME(yy,ShippedDate) AS Year
+FROM Orders INNER JOIN "Order Subtotals" ON Orders.OrderID = "Order Subtotals".OrderID
+WHERE Orders.ShippedDate Between @Beginning_Date And @Ending_Date
+go
+
+CREATE PROCEDURE [CustOrdersDetail] @OrderID int   
+   
+ AS SELECT ProductName,
+    UnitPrice=ROUND(Od.UnitPrice, 2),
+    Quantity,
+    Discount=CONVERT(int, Discount * 100), 
+    ExtendedPrice=ROUND(CONVERT(money, Quantity * (1 - Discount) * Od.UnitPrice), 2)
+FROM Products P, [Order Details] Od
+WHERE Od.ProductID = P.ProductID and Od.OrderID = @OrderID
+go
+
+CREATE PROCEDURE [CustOrdersOrders] @CustomerID nchar(5)   
+   
+ AS SELECT OrderID, 
+	OrderDate,
+	RequiredDate,
+	ShippedDate
+FROM Orders
+WHERE CustomerID = @CustomerID
+ORDER BY OrderID
+go
+
+CREATE PROCEDURE [CustOrderHist] @CustomerID nchar(5)   
+   
+ AS SELECT ProductName, Total=SUM(Quantity)
+FROM Products P, [Order Details] OD, Orders O, Customers C
+WHERE C.CustomerID = @CustomerID
+AND C.CustomerID = O.CustomerID AND O.OrderID = OD.OrderID AND OD.ProductID = P.ProductID
+GROUP BY ProductName
+go
+
+CREATE PROCEDURE [SalesByCategory] @CategoryName nvarchar(15) , @OrdYear nvarchar(4)  = '1998'   
+   
+ AS IF @OrdYear != '1996' AND @OrdYear != '1997' AND @OrdYear != '1998' 
+BEGIN
+	SELECT @OrdYear = '1998'
+END
+
+SELECT ProductName,
+	TotalPurchase=ROUND(SUM(CONVERT(decimal(14,2), OD.Quantity * (1-OD.Discount) * OD.UnitPrice)), 0)
+FROM [Order Details] OD, Orders O, Products P, Categories C
+WHERE OD.OrderID = O.OrderID 
+	AND OD.ProductID = P.ProductID 
+	AND P.CategoryID = C.CategoryID
+	AND C.CategoryName = @CategoryName
+	AND SUBSTRING(CONVERT(nvarchar(22), O.OrderDate, 111), 1, 4) = @OrdYear
+GROUP BY ProductName
+ORDER BY ProductName
+go
+
+CREATE PROCEDURE [sp_MSrepl_startup]   
+   
+ AS exec sys.sp_MSrepl_startup_internal
+go
+
+CREATE PROCEDURE [sp_MScleanupmergepublisher]   
+   
+ AS exec sys.sp_MScleanupmergepublisher_internal
+go
+
+CREATE TRIGGER dbo.tD_Categories ON dbo.TBL_CTGRIES FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_CTGRIES */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CTGRIES  dbo.TBL_PRDCTS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00012746", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CTGRIES"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Categories", FK_COLUMNS="CategoryID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_PRDCTS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_PRDCTS,deleted," = "," AND") */
+        dbo.TBL_PRDCTS.CategoryID = deleted.CategoryID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_CTGRIES because dbo.TBL_PRDCTS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Categories] ON TBL_CTGRIES
+go
+
+CREATE TRIGGER dbo.tU_Categories ON dbo.TBL_CTGRIES FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_CTGRIES */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insCategoryID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CTGRIES  dbo.TBL_PRDCTS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="0001444a", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CTGRIES"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Categories", FK_COLUMNS="CategoryID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(CategoryID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_PRDCTS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_PRDCTS,deleted," = "," AND") */
+        dbo.TBL_PRDCTS.CategoryID = deleted.CategoryID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_CTGRIES because dbo.TBL_PRDCTS exists.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Categories] ON TBL_CTGRIES
+go
+
+CREATE TRIGGER dbo.tD_CustomerCustomerDemo ON dbo.TBL_CSTMRCSTMRDEMO FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_CSTMRCSTMRDEMO */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CSTMRS  dbo.TBL_CSTMRCSTMRDEMO on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00032803", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo_Customers", FK_COLUMNS="CustomerID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_CSTMRS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_CSTMRS," = "," AND") */
+        deleted.CustomerID = dbo.TBL_CSTMRS.CustomerID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_CSTMRCSTMRDEMO
+          WHERE
+            /* %JoinFKPK(dbo.TBL_CSTMRCSTMRDEMO,dbo.TBL_CSTMRS," = "," AND") */
+            dbo.TBL_CSTMRCSTMRDEMO.CustomerID = dbo.TBL_CSTMRS.CustomerID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_CSTMRCSTMRDEMO because dbo.TBL_CSTMRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CSTMRDEMOGRPHS  dbo.TBL_CSTMRCSTMRDEMO on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRDEMOGRPHS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo", FK_COLUMNS="CustomerTypeID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_CSTMRDEMOGRPHS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_CSTMRDEMOGRPHS," = "," AND") */
+        deleted.CustomerTypeID = dbo.TBL_CSTMRDEMOGRPHS.CustomerTypeID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_CSTMRCSTMRDEMO
+          WHERE
+            /* %JoinFKPK(dbo.TBL_CSTMRCSTMRDEMO,dbo.TBL_CSTMRDEMOGRPHS," = "," AND") */
+            dbo.TBL_CSTMRCSTMRDEMO.CustomerTypeID = dbo.TBL_CSTMRDEMOGRPHS.CustomerTypeID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_CSTMRCSTMRDEMO because dbo.TBL_CSTMRDEMOGRPHS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_CustomerCustomerDemo] ON TBL_CSTMRCSTMRDEMO
+go
+
+CREATE TRIGGER dbo.tU_CustomerCustomerDemo ON dbo.TBL_CSTMRCSTMRDEMO FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_CSTMRCSTMRDEMO */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insCustomerID nchar(5), 
+           @insCustomerTypeID nchar(10),
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CSTMRS  dbo.TBL_CSTMRCSTMRDEMO on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="000329c7", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo_Customers", FK_COLUMNS="CustomerID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(CustomerID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_CSTMRS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_CSTMRS) */
+          inserted.CustomerID = dbo.TBL_CSTMRS.CustomerID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_CSTMRCSTMRDEMO because dbo.TBL_CSTMRS does not exist.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CSTMRDEMOGRPHS  dbo.TBL_CSTMRCSTMRDEMO on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRDEMOGRPHS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo", FK_COLUMNS="CustomerTypeID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(CustomerTypeID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_CSTMRDEMOGRPHS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_CSTMRDEMOGRPHS) */
+          inserted.CustomerTypeID = dbo.TBL_CSTMRDEMOGRPHS.CustomerTypeID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_CSTMRCSTMRDEMO because dbo.TBL_CSTMRDEMOGRPHS does not exist.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_CustomerCustomerDemo] ON TBL_CSTMRCSTMRDEMO
+go
+
+CREATE TRIGGER dbo.tD_CustomerDemographics ON dbo.TBL_CSTMRDEMOGRPHS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_CSTMRDEMOGRPHS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CSTMRDEMOGRPHS  dbo.TBL_CSTMRCSTMRDEMO on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="0001473b", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRDEMOGRPHS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo", FK_COLUMNS="CustomerTypeID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_CSTMRCSTMRDEMO
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_CSTMRCSTMRDEMO,deleted," = "," AND") */
+        dbo.TBL_CSTMRCSTMRDEMO.CustomerTypeID = deleted.CustomerTypeID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_CSTMRDEMOGRPHS because dbo.TBL_CSTMRCSTMRDEMO exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_CustomerDemographics] ON TBL_CSTMRDEMOGRPHS
+go
+
+CREATE TRIGGER dbo.tU_CustomerDemographics ON dbo.TBL_CSTMRDEMOGRPHS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_CSTMRDEMOGRPHS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insCustomerTypeID nchar(10),
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CSTMRDEMOGRPHS  dbo.TBL_CSTMRCSTMRDEMO on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="00016bc7", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRDEMOGRPHS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo", FK_COLUMNS="CustomerTypeID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(CustomerTypeID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_CSTMRCSTMRDEMO
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_CSTMRCSTMRDEMO,deleted," = "," AND") */
+        dbo.TBL_CSTMRCSTMRDEMO.CustomerTypeID = deleted.CustomerTypeID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_CSTMRDEMOGRPHS because dbo.TBL_CSTMRCSTMRDEMO exists.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_CustomerDemographics] ON TBL_CSTMRDEMOGRPHS
+go
+
+CREATE TRIGGER dbo.tD_Customers ON dbo.TBL_CSTMRS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_CSTMRS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CSTMRS  dbo.TBL_ORDRS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00024bb8", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Customers", FK_COLUMNS="CustomerID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDRS,deleted," = "," AND") */
+        dbo.TBL_ORDRS.CustomerID = deleted.CustomerID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_CSTMRS because dbo.TBL_ORDRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CSTMRS  dbo.TBL_CSTMRCSTMRDEMO on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo_Customers", FK_COLUMNS="CustomerID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_CSTMRCSTMRDEMO
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_CSTMRCSTMRDEMO,deleted," = "," AND") */
+        dbo.TBL_CSTMRCSTMRDEMO.CustomerID = deleted.CustomerID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_CSTMRS because dbo.TBL_CSTMRCSTMRDEMO exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Customers] ON TBL_CSTMRS
+go
+
+CREATE TRIGGER dbo.tU_Customers ON dbo.TBL_CSTMRS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_CSTMRS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insCustomerID nchar(5),
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CSTMRS  dbo.TBL_ORDRS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="00027d4b", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Customers", FK_COLUMNS="CustomerID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(CustomerID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDRS,deleted," = "," AND") */
+        dbo.TBL_ORDRS.CustomerID = deleted.CustomerID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_CSTMRS because dbo.TBL_ORDRS exists.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CSTMRS  dbo.TBL_CSTMRCSTMRDEMO on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_CSTMRCSTMRDEMO"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_CustomerCustomerDemo_Customers", FK_COLUMNS="CustomerID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(CustomerID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_CSTMRCSTMRDEMO
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_CSTMRCSTMRDEMO,deleted," = "," AND") */
+        dbo.TBL_CSTMRCSTMRDEMO.CustomerID = deleted.CustomerID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_CSTMRS because dbo.TBL_CSTMRCSTMRDEMO exists.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Customers] ON TBL_CSTMRS
+go
+
+CREATE TRIGGER dbo.tD_Employees ON dbo.TBL_EMPS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_EMPS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_EMPS  dbo.TBL_ORDRS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00047efd", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Employees", FK_COLUMNS="EmployeeID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDRS,deleted," = "," AND") */
+        dbo.TBL_ORDRS.EmployeeID = deleted.EmployeeID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_EMPS because dbo.TBL_ORDRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_EMPS  dbo.TBL_EMPTRTRS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Employees", FK_COLUMNS="EmployeeID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_EMPTRTRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_EMPTRTRS,deleted," = "," AND") */
+        dbo.TBL_EMPTRTRS.EmployeeID = deleted.EmployeeID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_EMPS because dbo.TBL_EMPTRTRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_EMPS  dbo.TBL_EMPS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Employees_Employees", FK_COLUMNS="ReportsTo" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_EMPS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_EMPS,deleted," = "," AND") */
+        dbo.TBL_EMPS.ReportsTo = deleted.EmployeeID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_EMPS because dbo.TBL_EMPS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_EMPS  dbo.TBL_EMPS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Employees_Employees", FK_COLUMNS="ReportsTo" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_EMPS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_EMPS," = "," AND") */
+        deleted.ReportsTo = dbo.TBL_EMPS.EmployeeID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_EMPS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_EMPS,dbo.TBL_EMPS," = "," AND") */
+            dbo.TBL_EMPS.ReportsTo = dbo.TBL_EMPS.EmployeeID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_EMPS because dbo.TBL_EMPS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Employees] ON TBL_EMPS
+go
+
+CREATE TRIGGER dbo.tU_Employees ON dbo.TBL_EMPS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_EMPS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insEmployeeID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_EMPS  dbo.TBL_ORDRS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="0004f208", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Employees", FK_COLUMNS="EmployeeID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(EmployeeID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDRS,deleted," = "," AND") */
+        dbo.TBL_ORDRS.EmployeeID = deleted.EmployeeID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_EMPS because dbo.TBL_ORDRS exists.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_EMPS  dbo.TBL_EMPTRTRS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Employees", FK_COLUMNS="EmployeeID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(EmployeeID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_EMPTRTRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_EMPTRTRS,deleted," = "," AND") */
+        dbo.TBL_EMPTRTRS.EmployeeID = deleted.EmployeeID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_EMPS because dbo.TBL_EMPTRTRS exists.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_EMPS  dbo.TBL_EMPS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Employees_Employees", FK_COLUMNS="ReportsTo" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(EmployeeID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_EMPS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_EMPS,deleted," = "," AND") */
+        dbo.TBL_EMPS.ReportsTo = deleted.EmployeeID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_EMPS because dbo.TBL_EMPS exists.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_EMPS  dbo.TBL_EMPS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Employees_Employees", FK_COLUMNS="ReportsTo" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(ReportsTo)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_EMPS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_EMPS) */
+          inserted.ReportsTo = dbo.TBL_EMPS.EmployeeID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    select @nullcnt = count(*) from inserted where
+      inserted.ReportsTo IS NULL
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_EMPS because dbo.TBL_EMPS does not exist.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Employees] ON TBL_EMPS
+go
+
+CREATE TRIGGER dbo.tD_EmployeeTerritories ON dbo.TBL_EMPTRTRS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_EMPTRTRS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_TRTRS  dbo.TBL_EMPTRTRS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="0002d201", PARENT_OWNER="dbo", PARENT_TABLE="TBL_TRTRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Territories", FK_COLUMNS="TerritoryID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_TRTRS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_TRTRS," = "," AND") */
+        deleted.TerritoryID = dbo.TBL_TRTRS.TerritoryID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_EMPTRTRS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_EMPTRTRS,dbo.TBL_TRTRS," = "," AND") */
+            dbo.TBL_EMPTRTRS.TerritoryID = dbo.TBL_TRTRS.TerritoryID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_EMPTRTRS because dbo.TBL_TRTRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_EMPS  dbo.TBL_EMPTRTRS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Employees", FK_COLUMNS="EmployeeID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_EMPS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_EMPS," = "," AND") */
+        deleted.EmployeeID = dbo.TBL_EMPS.EmployeeID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_EMPTRTRS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_EMPTRTRS,dbo.TBL_EMPS," = "," AND") */
+            dbo.TBL_EMPTRTRS.EmployeeID = dbo.TBL_EMPS.EmployeeID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_EMPTRTRS because dbo.TBL_EMPS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_EmployeeTerritories] ON TBL_EMPTRTRS
+go
+
+CREATE TRIGGER dbo.tU_EmployeeTerritories ON dbo.TBL_EMPTRTRS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_EMPTRTRS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insEmployeeID int, 
+           @insTerritoryID nvarchar(20),
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_TRTRS  dbo.TBL_EMPTRTRS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="0002ff26", PARENT_OWNER="dbo", PARENT_TABLE="TBL_TRTRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Territories", FK_COLUMNS="TerritoryID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(TerritoryID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_TRTRS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_TRTRS) */
+          inserted.TerritoryID = dbo.TBL_TRTRS.TerritoryID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_EMPTRTRS because dbo.TBL_TRTRS does not exist.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_EMPS  dbo.TBL_EMPTRTRS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Employees", FK_COLUMNS="EmployeeID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(EmployeeID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_EMPS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_EMPS) */
+          inserted.EmployeeID = dbo.TBL_EMPS.EmployeeID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_EMPTRTRS because dbo.TBL_EMPS does not exist.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_EmployeeTerritories] ON TBL_EMPTRTRS
+go
+
+CREATE TRIGGER dbo.tD_Order_Details ON dbo.TBL_ORDER_DETAILS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_ORDER_DETAILS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_PRDCTS  dbo.TBL_ORDER_DETAILS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="0002f21c", PARENT_OWNER="dbo", PARENT_TABLE="TBL_PRDCTS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Products", FK_COLUMNS="ProductID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_PRDCTS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_PRDCTS," = "," AND") */
+        deleted.ProductID = dbo.TBL_PRDCTS.ProductID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_ORDER_DETAILS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_ORDER_DETAILS,dbo.TBL_PRDCTS," = "," AND") */
+            dbo.TBL_ORDER_DETAILS.ProductID = dbo.TBL_PRDCTS.ProductID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_ORDER_DETAILS because dbo.TBL_PRDCTS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_ORDRS  dbo.TBL_ORDER_DETAILS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_ORDRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Orders", FK_COLUMNS="OrderID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_ORDRS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_ORDRS," = "," AND") */
+        deleted.OrderID = dbo.TBL_ORDRS.OrderID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_ORDER_DETAILS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_ORDER_DETAILS,dbo.TBL_ORDRS," = "," AND") */
+            dbo.TBL_ORDER_DETAILS.OrderID = dbo.TBL_ORDRS.OrderID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_ORDER_DETAILS because dbo.TBL_ORDRS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Order_Details] ON TBL_ORDER_DETAILS
+go
+
+CREATE TRIGGER dbo.tU_Order_Details ON dbo.TBL_ORDER_DETAILS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_ORDER_DETAILS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insOrderID int, 
+           @insProductID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_PRDCTS  dbo.TBL_ORDER_DETAILS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="0002f41d", PARENT_OWNER="dbo", PARENT_TABLE="TBL_PRDCTS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Products", FK_COLUMNS="ProductID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(ProductID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_PRDCTS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_PRDCTS) */
+          inserted.ProductID = dbo.TBL_PRDCTS.ProductID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_ORDER_DETAILS because dbo.TBL_PRDCTS does not exist.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_ORDRS  dbo.TBL_ORDER_DETAILS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_ORDRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Orders", FK_COLUMNS="OrderID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(OrderID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_ORDRS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_ORDRS) */
+          inserted.OrderID = dbo.TBL_ORDRS.OrderID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_ORDER_DETAILS because dbo.TBL_ORDRS does not exist.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Order_Details] ON TBL_ORDER_DETAILS
+go
+
+CREATE TRIGGER dbo.tD_Orders ON dbo.TBL_ORDRS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_ORDRS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_ORDRS  dbo.TBL_ORDER_DETAILS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00050e12", PARENT_OWNER="dbo", PARENT_TABLE="TBL_ORDRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Orders", FK_COLUMNS="OrderID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDER_DETAILS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDER_DETAILS,deleted," = "," AND") */
+        dbo.TBL_ORDER_DETAILS.OrderID = deleted.OrderID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_ORDRS because dbo.TBL_ORDER_DETAILS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_SHPPRS  dbo.TBL_ORDRS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SHPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Shippers", FK_COLUMNS="ShipVia" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_SHPPRS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_SHPPRS," = "," AND") */
+        deleted.ShipVia = dbo.TBL_SHPPRS.ShipperID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_ORDRS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_ORDRS,dbo.TBL_SHPPRS," = "," AND") */
+            dbo.TBL_ORDRS.ShipVia = dbo.TBL_SHPPRS.ShipperID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_ORDRS because dbo.TBL_SHPPRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_EMPS  dbo.TBL_ORDRS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Employees", FK_COLUMNS="EmployeeID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_EMPS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_EMPS," = "," AND") */
+        deleted.EmployeeID = dbo.TBL_EMPS.EmployeeID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_ORDRS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_ORDRS,dbo.TBL_EMPS," = "," AND") */
+            dbo.TBL_ORDRS.EmployeeID = dbo.TBL_EMPS.EmployeeID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_ORDRS because dbo.TBL_EMPS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CSTMRS  dbo.TBL_ORDRS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Customers", FK_COLUMNS="CustomerID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_CSTMRS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_CSTMRS," = "," AND") */
+        deleted.CustomerID = dbo.TBL_CSTMRS.CustomerID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_ORDRS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_ORDRS,dbo.TBL_CSTMRS," = "," AND") */
+            dbo.TBL_ORDRS.CustomerID = dbo.TBL_CSTMRS.CustomerID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_ORDRS because dbo.TBL_CSTMRS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Orders] ON TBL_ORDRS
+go
+
+CREATE TRIGGER dbo.tU_Orders ON dbo.TBL_ORDRS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_ORDRS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insOrderID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_ORDRS  dbo.TBL_ORDER_DETAILS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="0005cb13", PARENT_OWNER="dbo", PARENT_TABLE="TBL_ORDRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Orders", FK_COLUMNS="OrderID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(OrderID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDER_DETAILS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDER_DETAILS,deleted," = "," AND") */
+        dbo.TBL_ORDER_DETAILS.OrderID = deleted.OrderID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_ORDRS because dbo.TBL_ORDER_DETAILS exists.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_SHPPRS  dbo.TBL_ORDRS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SHPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Shippers", FK_COLUMNS="ShipVia" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(ShipVia)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_SHPPRS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_SHPPRS) */
+          inserted.ShipVia = dbo.TBL_SHPPRS.ShipperID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    select @nullcnt = count(*) from inserted where
+      inserted.ShipVia IS NULL
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_ORDRS because dbo.TBL_SHPPRS does not exist.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_EMPS  dbo.TBL_ORDRS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_EMPS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Employees", FK_COLUMNS="EmployeeID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(EmployeeID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_EMPS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_EMPS) */
+          inserted.EmployeeID = dbo.TBL_EMPS.EmployeeID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    select @nullcnt = count(*) from inserted where
+      inserted.EmployeeID IS NULL
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_ORDRS because dbo.TBL_EMPS does not exist.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CSTMRS  dbo.TBL_ORDRS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CSTMRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Customers", FK_COLUMNS="CustomerID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(CustomerID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_CSTMRS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_CSTMRS) */
+          inserted.CustomerID = dbo.TBL_CSTMRS.CustomerID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    select @nullcnt = count(*) from inserted where
+      inserted.CustomerID IS NULL
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_ORDRS because dbo.TBL_CSTMRS does not exist.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Orders] ON TBL_ORDRS
+go
+
+CREATE TRIGGER dbo.tD_Products ON dbo.TBL_PRDCTS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_PRDCTS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_PRDCTS  dbo.TBL_ORDER_DETAILS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="0003c757", PARENT_OWNER="dbo", PARENT_TABLE="TBL_PRDCTS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Products", FK_COLUMNS="ProductID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDER_DETAILS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDER_DETAILS,deleted," = "," AND") */
+        dbo.TBL_ORDER_DETAILS.ProductID = deleted.ProductID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_PRDCTS because dbo.TBL_ORDER_DETAILS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_SPPRS  dbo.TBL_PRDCTS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Suppliers", FK_COLUMNS="SupplierID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_SPPRS
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_SPPRS," = "," AND") */
+        deleted.SupplierID = dbo.TBL_SPPRS.SupplierID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_PRDCTS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_PRDCTS,dbo.TBL_SPPRS," = "," AND") */
+            dbo.TBL_PRDCTS.SupplierID = dbo.TBL_SPPRS.SupplierID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_PRDCTS because dbo.TBL_SPPRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_CTGRIES  dbo.TBL_PRDCTS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CTGRIES"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Categories", FK_COLUMNS="CategoryID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_CTGRIES
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_CTGRIES," = "," AND") */
+        deleted.CategoryID = dbo.TBL_CTGRIES.CategoryID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_PRDCTS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_PRDCTS,dbo.TBL_CTGRIES," = "," AND") */
+            dbo.TBL_PRDCTS.CategoryID = dbo.TBL_CTGRIES.CategoryID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_PRDCTS because dbo.TBL_CTGRIES exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Products] ON TBL_PRDCTS
+go
+
+CREATE TRIGGER dbo.tU_Products ON dbo.TBL_PRDCTS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_PRDCTS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insProductID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_PRDCTS  dbo.TBL_ORDER_DETAILS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="000450e6", PARENT_OWNER="dbo", PARENT_TABLE="TBL_PRDCTS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDER_DETAILS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Order_Details_Products", FK_COLUMNS="ProductID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(ProductID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDER_DETAILS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDER_DETAILS,deleted," = "," AND") */
+        dbo.TBL_ORDER_DETAILS.ProductID = deleted.ProductID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_PRDCTS because dbo.TBL_ORDER_DETAILS exists.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_SPPRS  dbo.TBL_PRDCTS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Suppliers", FK_COLUMNS="SupplierID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(SupplierID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_SPPRS
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_SPPRS) */
+          inserted.SupplierID = dbo.TBL_SPPRS.SupplierID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    select @nullcnt = count(*) from inserted where
+      inserted.SupplierID IS NULL
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_PRDCTS because dbo.TBL_SPPRS does not exist.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_CTGRIES  dbo.TBL_PRDCTS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_CTGRIES"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Categories", FK_COLUMNS="CategoryID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(CategoryID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_CTGRIES
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_CTGRIES) */
+          inserted.CategoryID = dbo.TBL_CTGRIES.CategoryID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    select @nullcnt = count(*) from inserted where
+      inserted.CategoryID IS NULL
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_PRDCTS because dbo.TBL_CTGRIES does not exist.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Products] ON TBL_PRDCTS
+go
+
+CREATE TRIGGER dbo.tD_Region ON dbo.TBL_RGN FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_RGN */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_RGN  dbo.TBL_TRTRS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="000118d8", PARENT_OWNER="dbo", PARENT_TABLE="TBL_RGN"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_TRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Territories_Region", FK_COLUMNS="RegionID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_TRTRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_TRTRS,deleted," = "," AND") */
+        dbo.TBL_TRTRS.RegionID = deleted.RegionID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_RGN because dbo.TBL_TRTRS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Region] ON TBL_RGN
+go
+
+CREATE TRIGGER dbo.tU_Region ON dbo.TBL_RGN FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_RGN */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insRegionID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_RGN  dbo.TBL_TRTRS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="00012fca", PARENT_OWNER="dbo", PARENT_TABLE="TBL_RGN"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_TRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Territories_Region", FK_COLUMNS="RegionID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(RegionID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_TRTRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_TRTRS,deleted," = "," AND") */
+        dbo.TBL_TRTRS.RegionID = deleted.RegionID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_RGN because dbo.TBL_TRTRS exists.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Region] ON TBL_RGN
+go
+
+CREATE TRIGGER dbo.tD_Shippers ON dbo.TBL_SHPPRS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_SHPPRS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_SHPPRS  dbo.TBL_ORDRS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00012f1e", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SHPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Shippers", FK_COLUMNS="ShipVia" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDRS,deleted," = "," AND") */
+        dbo.TBL_ORDRS.ShipVia = deleted.ShipperID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_SHPPRS because dbo.TBL_ORDRS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Shippers] ON TBL_SHPPRS
+go
+
+CREATE TRIGGER dbo.tU_Shippers ON dbo.TBL_SHPPRS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_SHPPRS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insShipperID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_SHPPRS  dbo.TBL_ORDRS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="000139dd", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SHPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_ORDRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Orders_Shippers", FK_COLUMNS="ShipVia" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(ShipperID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_ORDRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_ORDRS,deleted," = "," AND") */
+        dbo.TBL_ORDRS.ShipVia = deleted.ShipperID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_SHPPRS because dbo.TBL_ORDRS exists.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Shippers] ON TBL_SHPPRS
+go
+
+CREATE TRIGGER dbo.tD_Suppliers ON dbo.TBL_SPPRS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_SPPRS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_SPPRS  dbo.TBL_PRDCTS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="000124dc", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Suppliers", FK_COLUMNS="SupplierID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_PRDCTS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_PRDCTS,deleted," = "," AND") */
+        dbo.TBL_PRDCTS.SupplierID = deleted.SupplierID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_SPPRS because dbo.TBL_PRDCTS exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Suppliers] ON TBL_SPPRS
+go
+
+CREATE TRIGGER dbo.tU_Suppliers ON dbo.TBL_SPPRS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_SPPRS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insSupplierID int,
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_SPPRS  dbo.TBL_PRDCTS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="00013e83", PARENT_OWNER="dbo", PARENT_TABLE="TBL_SPPRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_PRDCTS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Products_Suppliers", FK_COLUMNS="SupplierID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(SupplierID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_PRDCTS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_PRDCTS,deleted," = "," AND") */
+        dbo.TBL_PRDCTS.SupplierID = deleted.SupplierID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_SPPRS because dbo.TBL_PRDCTS exists.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Suppliers] ON TBL_SPPRS
+go
+
+CREATE TRIGGER dbo.tD_Territories ON dbo.TBL_TRTRS FOR DELETE AS
+/* erwin Builtin Trigger */
+/* DELETE trigger on TBL_TRTRS */
+BEGIN
+  DECLARE  @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_TRTRS  dbo.TBL_EMPTRTRS on parent delete no action */
+    /* ERWIN_RELATION:CHECKSUM="000273da", PARENT_OWNER="dbo", PARENT_TABLE="TBL_TRTRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Territories", FK_COLUMNS="TerritoryID" */
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_EMPTRTRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_EMPTRTRS,deleted," = "," AND") */
+        dbo.TBL_EMPTRTRS.TerritoryID = deleted.TerritoryID
+    )
+    BEGIN
+      SELECT @errno  = 30001,
+             @errmsg = 'Cannot delete dbo.TBL_TRTRS because dbo.TBL_EMPTRTRS exists.'
+      GOTO error
+    END
+
+    /* erwin Builtin Trigger */
+    /* dbo.TBL_RGN  dbo.TBL_TRTRS on child delete no action */
+    /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_RGN"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_TRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Territories_Region", FK_COLUMNS="RegionID" */
+    IF EXISTS (SELECT * FROM deleted,dbo.TBL_RGN
+      WHERE
+        /* %JoinFKPK(deleted,dbo.TBL_RGN," = "," AND") */
+        deleted.RegionID = dbo.TBL_RGN.RegionID AND
+        NOT EXISTS (
+          SELECT * FROM dbo.TBL_TRTRS
+          WHERE
+            /* %JoinFKPK(dbo.TBL_TRTRS,dbo.TBL_RGN," = "," AND") */
+            dbo.TBL_TRTRS.RegionID = dbo.TBL_RGN.RegionID
+        )
+    )
+    BEGIN
+      SELECT @errno  = 30010,
+             @errmsg = 'Cannot delete last dbo.TBL_TRTRS because dbo.TBL_RGN exists.'
+      GOTO error
+    END
+
+
+    /* erwin Builtin Trigger */
+    RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tD_Territories] ON TBL_TRTRS
+go
+
+CREATE TRIGGER dbo.tU_Territories ON dbo.TBL_TRTRS FOR UPDATE AS
+/* erwin Builtin Trigger */
+/* UPDATE trigger on TBL_TRTRS */
+BEGIN
+  DECLARE  @numrows int,
+           @nullcnt int,
+           @validcnt int,
+           @insTerritoryID nvarchar(20),
+           @errno   int,
+           @severity int,
+           @state    int,
+           @errmsg  varchar(255)
+
+  SELECT @numrows = @@rowcount
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_TRTRS  dbo.TBL_EMPTRTRS on parent update no action */
+  /* ERWIN_RELATION:CHECKSUM="0002ab6c", PARENT_OWNER="dbo", PARENT_TABLE="TBL_TRTRS"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_EMPTRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_EmployeeTerritories_Territories", FK_COLUMNS="TerritoryID" */
+  IF
+    /* %ParentPK(" OR",UPDATE) */
+    UPDATE(TerritoryID)
+  BEGIN
+    IF EXISTS (
+      SELECT * FROM deleted,dbo.TBL_EMPTRTRS
+      WHERE
+        /*  %JoinFKPK(dbo.TBL_EMPTRTRS,deleted," = "," AND") */
+        dbo.TBL_EMPTRTRS.TerritoryID = deleted.TerritoryID
+    )
+    BEGIN
+      SELECT @errno  = 30005,
+             @errmsg = 'Cannot update dbo.TBL_TRTRS because dbo.TBL_EMPTRTRS exists.'
+      GOTO error
+    END
+  END
+
+  /* erwin Builtin Trigger */
+  /* dbo.TBL_RGN  dbo.TBL_TRTRS on child update no action */
+  /* ERWIN_RELATION:CHECKSUM="00000000", PARENT_OWNER="dbo", PARENT_TABLE="TBL_RGN"
+    CHILD_OWNER="dbo", CHILD_TABLE="TBL_TRTRS"
+    P2C_VERB_PHRASE="", C2P_VERB_PHRASE="", 
+    FK_CONSTRAINT="FK_Territories_Region", FK_COLUMNS="RegionID" */
+  IF
+    /* %ChildFK(" OR",UPDATE) */
+    UPDATE(RegionID)
+  BEGIN
+    SELECT @nullcnt = 0
+    SELECT @validcnt = count(*)
+      FROM inserted,dbo.TBL_RGN
+        WHERE
+          /* %JoinFKPK(inserted,dbo.TBL_RGN) */
+          inserted.RegionID = dbo.TBL_RGN.RegionID
+    /* %NotnullFK(inserted," IS NULL","select @nullcnt = count(*) from inserted where"," AND") */
+    
+    IF @validcnt + @nullcnt != @numrows
+    BEGIN
+      SELECT @errno  = 30007,
+             @errmsg = 'Cannot update dbo.TBL_TRTRS because dbo.TBL_RGN does not exist.'
+      GOTO error
+    END
+  END
+
+
+  /* erwin Builtin Trigger */
+  RETURN
+error:
+   RAISERROR (@errmsg, -- Message text.
+              @severity, -- Severity (0~25).
+              @state) -- State (0~255).
+    rollback transaction
+END
+
+go
+
+
+
+
+ENABLE TRIGGER [tU_Territories] ON TBL_TRTRS
+go
