@@ -2741,3 +2741,7 @@ go
 
 ENABLE TRIGGER [tU_Territories] ON TBL_TRTRS
 go
+
+
+DROP VIEW [dbo].[SPT_VALUES]
+go
